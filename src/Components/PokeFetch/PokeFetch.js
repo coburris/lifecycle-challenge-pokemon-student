@@ -9,8 +9,30 @@ class PokeFetch extends Component {
       pokeInfo: '',
       pokeSprite: '',
       pokeName: '',
+      secondsLeft: 10,
+      timer_id: null
     }
   }
+
+  componentDidUpdate(prevProps, prevState) {
+    let timerID;
+    if(prevState.pokeInfo !== this.state.pokeInfo){
+      if(this.state.timer_id) clearInterval(this.state.timer_id);
+      console.log("changed");
+      this.setState({secondsLeft: 10});
+      timerID = setInterval(() => this.tick(), 1000)
+      this.setState({timer_id: timerID})
+    }
+
+    if(this.state.secondsLeft === 0){
+      console.log("got to 0")
+      clearInterval(this.state.timer_id);
+    }
+  }
+
+  tick = () => this.setState({secondsLeft: this.state.secondsLeft - 1});
+
+
 
   fetchPokemon() {
     let min = Math.ceil(1);
@@ -33,10 +55,10 @@ class PokeFetch extends Component {
     return (
       <div className={'wrapper'}>
         <button className={'start'} onClick={() => this.fetchPokemon()}>Start!</button>
-        <h1 className={'timer'} >Timer Display</h1>
+        <h1 className={'timer'} >Seconds Left: {this.state.secondsLeft}</h1>
         <div className={'pokeWrap'}>
-          <img className={'pokeImg'} src={this.state.pokeSprite} />
-          <h1 className={'pokeName'}>{this.state.pokeName}</h1>
+          <img className={'pokeImg'} src={this.state.pokeSprite} style={this.state.secondsLeft>0 ? {filter:'brightness(0%)'} : {filter:'brightness(100%)'}} alt="" />
+          <h1 className={'pokeName'}>{this.state.secondsLeft>0 ? null : this.state.pokeName}</h1>
         </div>
       </div>
     )
